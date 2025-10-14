@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OpenBCI_BandAlert")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+579bcc7ab354b90058666ff37f2913b15202fa39")]
 [assembly: System.Reflection.AssemblyProductAttribute("OpenBCI_BandAlert")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OpenBCI_BandAlert")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

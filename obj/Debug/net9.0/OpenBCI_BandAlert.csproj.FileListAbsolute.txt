@@ -33,3 +33,4 @@ C:\Users\edgar\OneDrive\git\openbci\obj\Debug\net9.0\refint\OpenBCI_BandAlert.dl
 C:\Users\edgar\OneDrive\git\openbci\obj\Debug\net9.0\OpenBCI_BandAlert.pdb
 C:\Users\edgar\OneDrive\git\openbci\obj\Debug\net9.0\OpenBCI_BandAlert.genruntimeconfig.cache
 C:\Users\edgar\OneDrive\git\openbci\obj\Debug\net9.0\ref\OpenBCI_BandAlert.dll
+C:\Users\edgar\OneDrive\git\openbci\obj\Debug\net9.0\OpenBCI_BandAlert.sourcelink.json
