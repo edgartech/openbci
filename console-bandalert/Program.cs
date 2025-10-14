@@ -141,8 +141,11 @@ class Program
                     // Calculate time in current band
                     double timeInBand = (DateTime.UtcNow - bandStartTime).TotalSeconds;
 
-                    // Get dominant frequency (center of band range)
-                    double dominantFrequency = (Bands[idx].lo + Bands[idx].hi) / 2.0;
+                    // Get dominant frequency with variation
+                    // Note: In AvgBandPower mode, we don't receive FFT bins, only aggregated powers
+                    // So we estimate frequency within the band range weighted by power
+                    double bandWidth = Bands[idx].hi - Bands[idx].lo;
+                    double dominantFrequency = Bands[idx].lo + (bandWidth * frac); // Weight by power fraction
 
                     bool isAlert = false;
                     if (stableCount >= STABLE_FRAMES)
@@ -156,7 +159,7 @@ class Program
                     {
                         timestamp = DateTime.UtcNow.ToString("o"),
                         dominantBand = dom,
-                        dominantFrequency = dominantFrequency,
+                        dominantFrequency = Math.Round(dominantFrequency, 1),
                         timeInBand = Math.Round(timeInBand, 2),
                         bandPowers = new
                         {
@@ -242,8 +245,11 @@ class Program
                     // Calculate time in current band
                     double timeInBand = (DateTime.UtcNow - bandStartTime).TotalSeconds;
 
-                    // Get dominant frequency (center of band range)
-                    double dominantFrequency = (Bands[idx].lo + Bands[idx].hi) / 2.0;
+                    // Get dominant frequency with variation
+                    // Note: In AvgBandPower mode, we don't receive FFT bins, only aggregated powers
+                    // So we estimate frequency within the band range weighted by power
+                    double bandWidth = Bands[idx].hi - Bands[idx].lo;
+                    double dominantFrequency = Bands[idx].lo + (bandWidth * frac); // Weight by power fraction
 
                     bool isAlert = false;
                     if (stableCount >= STABLE_FRAMES)
@@ -257,7 +263,7 @@ class Program
                     {
                         timestamp = DateTime.UtcNow.ToString("o"),
                         dominantBand = dom,
-                        dominantFrequency = dominantFrequency,
+                        dominantFrequency = Math.Round(dominantFrequency, 1),
                         timeInBand = Math.Round(timeInBand, 2),
                         bandPowers = new
                         {

@@ -53,7 +53,7 @@ A real-time brainwave visualization system with customizable audio alerts. This 
 
 ```bash
 # Navigate to the backend directory
-cd openbci
+cd openbci/console-bandalert
 
 # Restore dependencies
 dotnet restore
@@ -71,7 +71,7 @@ The backend will:
 - Begin broadcasting data to connected clients
 
 **Configuration:**
-Edit `Program.cs` to change settings:
+Edit `console-bandalert/Program.cs` to change settings:
 ```csharp
 const bool USE_AVERAGE_BANDPOWER = true; // true = Port 15000, false = Port 15001
 const int WEBSOCKET_PORT = 8080;
@@ -261,7 +261,7 @@ OpenBCI Data → UDP (Port 15000/15001) → C# Application
 
 ### Custom Band Ranges
 
-Edit `Program.cs`:
+Edit `console-bandalert/Program.cs`:
 ```csharp
 static readonly (string label, double lo, double hi)[] Bands = new[] {
     ("delta", 1.0, 4.0),
@@ -294,8 +294,9 @@ Band colors are defined in:
 
 ```
 openbci/
-├── Program.cs                          # C# backend application
-├── OpenBCI_BandAlert.csproj           # C# project file
+├── console-bandalert/                 # C# .NET backend
+│   ├── Program.cs                     # C# backend application
+│   └── OpenBCI_BandAlert.csproj      # C# project file
 └── angular-brainwave-ui/              # Angular frontend
     ├── src/
     │   ├── app/
@@ -334,7 +335,7 @@ dotnet watch run
 
 **Debug mode:**
 - Use Visual Studio or VS Code with C# extension
-- Set breakpoints in Program.cs
+- Set breakpoints in console-bandalert/Program.cs
 - Launch with F5
 
 ### Frontend Development

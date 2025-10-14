@@ -13,8 +13,8 @@ Before starting, ensure you have:
 ### 1. Backend Setup (5 minutes)
 
 ```bash
-# Navigate to project root
-cd openbci
+# Navigate to backend directory
+cd openbci/console-bandalert
 
 # Install Fleck WebSocket library
 dotnet restore
@@ -85,7 +85,7 @@ In OpenBCI GUI or your data source:
 **For Raw Time Series mode:**
 - Set UDP streaming to `localhost:15001`
 - Enable Raw Data output
-- Update `Program.cs`: `const bool USE_AVERAGE_BANDPOWER = false;`
+- Update `console-bandalert/Program.cs`: `const bool USE_AVERAGE_BANDPOWER = false;`
 
 ### 5. Test the System
 
@@ -108,7 +108,7 @@ In OpenBCI GUI or your data source:
 - **Solution**: Install .NET 9.0 SDK from https://dotnet.microsoft.com/download
 
 **Problem**: WebSocket server won't start
-- **Solution**: Port 8080 may be in use. Edit `Program.cs` and change `WEBSOCKET_PORT`
+- **Solution**: Port 8080 may be in use. Edit `console-bandalert/Program.cs` and change `WEBSOCKET_PORT`
 
 **Problem**: No data received from OpenBCI
 - **Solution**: 
@@ -146,7 +146,7 @@ In OpenBCI GUI or your data source:
 - **Solution**: 
   - For pre-computed bands: Use Average Band Power mode → Port 15000
   - For raw EEG: Use Raw Time Series mode → Port 15001
-  - Match `USE_AVERAGE_BANDPOWER` setting in `Program.cs`
+  - Match `USE_AVERAGE_BANDPOWER` setting in `console-bandalert/Program.cs`
 
 ## Network Configuration
 
@@ -154,7 +154,7 @@ In OpenBCI GUI or your data source:
 
 **Backend on Server (e.g., 192.168.1.100):**
 
-1. Update `Program.cs`:
+1. Update `console-bandalert/Program.cs`:
    ```csharp
    var server = new WebSocketServer($"ws://0.0.0.0:{WEBSOCKET_PORT}");
    ```
@@ -206,7 +206,7 @@ Update `environment.prod.ts` with production WebSocket URL before building.
 
 ### File Locations
 
-- **Backend Configuration**: `openbci/Program.cs`
+- **Backend Configuration**: `openbci/console-bandalert/Program.cs`
 - **Frontend Configuration**: `angular-brainwave-ui/src/environments/environment.ts`
 - **Audio Files**: `angular-brainwave-ui/src/assets/sounds/`
 - **Settings Storage**: Browser LocalStorage
