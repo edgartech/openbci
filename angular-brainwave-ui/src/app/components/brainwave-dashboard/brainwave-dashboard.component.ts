@@ -2,18 +2,22 @@ import { Component, computed, signal, OnInit, Output, EventEmitter } from '@angu
 import { CommonModule } from '@angular/common';
 import { BrainwaveService, BAND_INFO, BrainwaveBand } from '../../services/brainwave.service';
 import { AlertService } from '../../services/alert.service';
+import { SessionService } from '../../services/session.service';
+import { WaveformDisplayComponent } from '../waveform-display/waveform-display.component';
 
 @Component({
   selector: 'app-brainwave-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, WaveformDisplayComponent],
   templateUrl: './brainwave-dashboard.component.html',
   styleUrls: ['./brainwave-dashboard.component.css']
 })
 export class BrainwaveDashboardComponent implements OnInit {
   @Output() settingsClick = new EventEmitter<void>();
+  @Output() historyClick = new EventEmitter<void>();
   
   showSettings = signal(false);
+  isRecording = computed(() => this.sessionService.isRecording());
   
   // Computed properties for reactive UI updates
   dominantBand = computed(() => {
@@ -87,15 +91,25 @@ export class BrainwaveDashboardComponent implements OnInit {
 
   constructor(
     public brainwaveService: BrainwaveService,
-    public alertService: AlertService
+    public alertService: AlertService,
+    public sessionService: SessionService
   ) {}
 
   ngOnInit(): void {
-    // Component initialization
+    // Update session with brainwave data
+    this.brainwaveService.data$.subscribe(data => {
+      if (this.sessionService.isRecording()) {
+        this.sessionService.updateSession(data);
+      }
+    });
   }
 
   toggleSettings(): void {
     this.settingsClick.emit();
+  }
+
+  toggleHistory(): void {
+    this.historyClick.emit();
   }
 
   reconnect(): void {
