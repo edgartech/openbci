@@ -1,0 +1,299 @@
+<div class="min-h-screen bg-gray-900 text-white p-4 safe-area-top safe-area-bottom">
+  <div class="max-w-2xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold mb-2">Audio & Alert Settings</h1>
+      <p class="text-gray-400">Configure sounds and duration thresholds for each brainwave band</p>
+    </div>
+
+    <!-- Global controls -->
+    <div class="bg-gray-800 rounded-lg p-4 mb-6">
+      <h2 class="text-lg font-semibold mb-4">Global Controls</h2>
+      
+      <!-- Master volume -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-sm font-medium">Master Volume</label>
+          <span class="text-sm text-gray-400">{{ audioService.masterVolume() }}%</span>
+        </div>
+        <input 
+          type="range" 
+          min="0" 
+          max="100" 
+          [value]="audioService.masterVolume()"
+          (input)="updateMasterVolume(+$any($event.target).value)"
+          class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+      </div>
+
+      <!-- Global enable/disable -->
+      <div class="flex items-center justify-between">
+        <label class="text-sm font-medium">Enable All Sounds</label>
+        <button 
+          (click)="toggleGlobalEnabled()"
+          [class]="audioService.globalEnabled() 
+            ? 'bg-green-600 hover:bg-green-700' 
+            : 'bg-gray-600 hover:bg-gray-500'"
+          class="touch-target px-4 py-2 rounded-lg font-medium transition-colors">
+          {{ audioService.globalEnabled() ? 'Enabled' : 'Disabled' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Band settings -->
+    <div class="space-y-3">
+      @for (band of bands; track band) {
+        <div 
+          class="bg-gray-800 rounded-lg overflow-hidden border-2 transition-colors"
+          [style.border-color]="getBandInfo(band).color + '40'">
+          
+          <!-- Band header (always visible) -->
+          <button
+            (click)="toggleBandExpansion(band)"
+            class="w-full p-4 flex items-center justify-between hover:bg-gray-750 transition-colors touch-target">
+            <div class="flex items-center gap-3">
+              <div 
+                class="w-6 h-6 rounded"
+                [style.background-color]="getBandInfo(band).color">
+              </div>
+              <div class="text-left">
+                <div class="font-semibold">{{ getBandInfo(band).label }}</div>
+                <div class="text-sm text-gray-400">{{ getBandInfo(band).range }}</div>
+              </div>
+            </div>
+            
+            <svg 
+              class="w-6 h-6 transition-transform"
+              [class.rotate-180]="isBandExpanded(band)"
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Expanded settings -->
+          @if (isBandExpanded(band)) {
+            <div class="p-4 border-t border-gray-700 space-y-4">
+              
+              <!-- Duration threshold -->
+              <div class="bg-gray-900/50 rounded-lg p-3">
+                <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Duration Threshold
+                </h3>
+                
+                <div class="mb-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="text-sm text-gray-400">Minimum Duration (seconds)</label>
+                    <span class="text-sm font-medium">{{ getThreshold(band).duration.toFixed(1) }}s</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="30" 
+                    step="0.5"
+                    [value]="getThreshold(band).duration"
+                    (input)="updateThresholdDuration(band, +$any($event.target).value)"
+                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                  <p class="text-xs text-gray-500 mt-1">
+                    Alert triggers after staying in this band for the set duration
+                  </p>
+                </div>
+
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    [checked]="getThreshold(band).enabled"
+                    (change)="updateThresholdEnabled(band, $any($event.target).checked)"
+                    class="w-4 h-4 rounded">
+                  <span class="text-sm">Enable threshold alerts for this band</span>
+                </label>
+              </div>
+
+              <!-- Audio source type -->
+              <div>
+                <label class="text-sm font-medium mb-2 block">Audio Source</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    (click)="updateSourceType(band, 'preset')"
+                    [class]="getBandConfig(band).sourceType === 'preset' 
+                      ? 'bg-blue-600 border-blue-500' 
+                      : 'bg-gray-700 border-gray-600'"
+                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors">
+                    Preset
+                  </button>
+                  <button
+                    (click)="updateSourceType(band, 'tone')"
+                    [class]="getBandConfig(band).sourceType === 'tone' 
+                      ? 'bg-blue-600 border-blue-500' 
+                      : 'bg-gray-700 border-gray-600'"
+                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors">
+                    Tone
+                  </button>
+                  <button
+                    (click)="updateSourceType(band, 'custom')"
+                    [class]="getBandConfig(band).sourceType === 'custom' 
+                      ? 'bg-blue-600 border-blue-500' 
+                      : 'bg-gray-700 border-gray-600'"
+                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors">
+                    Custom
+                  </button>
+                  <button
+                    (click)="updateSourceType(band, 'disabled')"
+                    [class]="getBandConfig(band).sourceType === 'disabled' 
+                      ? 'bg-red-600 border-red-500' 
+                      : 'bg-gray-700 border-gray-600'"
+                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors">
+                    Disabled
+                  </button>
+                </div>
+              </div>
+
+              <!-- Preset sound selection -->
+              @if (getBandConfig(band).sourceType === 'preset') {
+                <div>
+                  <label class="text-sm font-medium mb-2 block">Preset Sound</label>
+                  <select 
+                    [value]="getBandConfig(band).presetSound"
+                    (change)="updatePresetSound(band, $any($event.target).value)"
+                    class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
+                    @for (sound of presetSounds; track sound) {
+                      <option [value]="sound">{{ sound }}</option>
+                    }
+                  </select>
+                </div>
+              }
+
+              <!-- Tone configuration -->
+              @if (getBandConfig(band).sourceType === 'tone') {
+                <div class="space-y-3">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="text-sm font-medium">Frequency (Hz)</label>
+                      <span class="text-sm text-gray-400">{{ getBandConfig(band).toneFrequency }}</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="100" 
+                      max="2000" 
+                      step="10"
+                      [value]="getBandConfig(band).toneFrequency"
+                      (input)="updateToneFrequency(band, +$any($event.target).value)"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                  </div>
+
+                  <div>
+                    <label class="text-sm font-medium mb-2 block">Wave Type</label>
+                    <select 
+                      [value]="getBandConfig(band).toneType"
+                      (change)="updateToneType(band, $any($event.target).value)"
+                      class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
+                      @for (type of oscillatorTypes; track type) {
+                        <option [value]="type">{{ type }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="text-sm font-medium">Duration (ms)</label>
+                      <span class="text-sm text-gray-400">{{ getBandConfig(band).toneDuration }}</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="50" 
+                      max="2000" 
+                      step="50"
+                      [value]="getBandConfig(band).toneDuration"
+                      (input)="updateToneDuration(band, +$any($event.target).value)"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                  </div>
+                </div>
+              }
+
+              <!-- Custom audio upload -->
+              @if (getBandConfig(band).sourceType === 'custom') {
+                <div>
+                  @if (getBandConfig(band).customAudioUrl) {
+                    <div class="bg-gray-900/50 rounded p-3 mb-2">
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                          </svg>
+                          <span class="text-sm">{{ getBandConfig(band).customAudioName }}</span>
+                        </div>
+                        <button
+                          (click)="clearCustomAudio(band)"
+                          class="text-red-500 hover:text-red-400 p-1">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                  
+                  <label class="block">
+                    <input 
+                      type="file" 
+                      accept="audio/*"
+                      (change)="onFileSelected(band, $event)"
+                      class="hidden">
+                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-gray-500 transition-colors">
+                      <svg class="w-8 h-8 mx-auto mb-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p class="text-sm text-gray-400">Click to upload audio file</p>
+                      <p class="text-xs text-gray-500 mt-1">MP3, WAV, OGG (max 5MB)</p>
+                    </div>
+                  </label>
+                </div>
+              }
+
+              <!-- Volume control -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <label class="text-sm font-medium">Volume</label>
+                  <span class="text-sm text-gray-400">{{ getBandConfig(band).volume }}%</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  [value]="getBandConfig(band).volume"
+                  (input)="updateVolume(band, +$any($event.target).value)"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+              </div>
+
+              <!-- Test button -->
+              <div class="flex gap-2">
+                <button
+                  (click)="testSound(band)"
+                  class="touch-target flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors">
+                  Test Sound
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Reset button -->
+    <div class="mt-6">
+      <button
+        (click)="resetAllSettings()"
+        class="touch-target w-full px-4 py-3 bg-red-900/30 hover:bg-red-900/50 border border-red-700 rounded-lg font-medium transition-colors">
+        Reset All Settings to Defaults
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="min-h-screen bg-gray-900 text-white safe-area-top safe-area-bottom">
+  <!-- Header with connection status -->
+  <header class="sticky top-0 z-50 bg-gray-800 border-b border-gray-700 px-4 py-3">
+    <div class="flex items-center justify-between max-w-2xl mx-auto">
+      <div class="flex items-center gap-3">
+        <div [class]="'w-3 h-3 rounded-full ' + connectionStatusClass()"></div>
+        <h1 class="text-xl font-bold">Brainwave Monitor</h1>
+      </div>
+      
+      <button 
+        (click)="toggleSettings()"
+        class="touch-target p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="max-w-2xl mx-auto px-4 py-6">
+    
+    @if (connectionStatus() === 'disconnected' || connectionStatus() === 'error') {
+      <!-- Connection error state -->
+      <div class="bg-red-900/30 border border-red-700 rounded-lg p-6 text-center">
+        <svg class="w-16 h-16 mx-auto mb-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h2 class="text-xl font-bold mb-2">Connection Lost</h2>
+        <p class="text-gray-400 mb-4">Unable to connect to the brainwave server</p>
+        <button 
+          (click)="reconnect()"
+          class="touch-target px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+          Reconnect
+        </button>
+      </div>
+    } @else {
+      <!-- Dominant band display -->
+      <div 
+        class="rounded-2xl p-8 mb-6 text-center smooth-transition"
+        [class.animate-alert-pulse]="thresholdMet()"
+        [style.background-color]="dominantBandColor() + '40'">
+        
+        <div class="mb-2 text-sm font-medium text-gray-300 uppercase tracking-wider">
+          Dominant Band
+        </div>
+        
+        <div class="mb-4">
+          <div class="text-6xl font-bold mb-2">
+            {{ dominantBandLabel() }}
+          </div>
+          <div class="text-xl text-gray-300">
+            {{ dominantBandRange() }}
+          </div>
+          <div class="text-lg text-gray-400 mt-1">
+            {{ dominantFrequency() }} Hz
+          </div>
+        </div>
+
+        <!-- Time in band with threshold -->
+        <div class="mt-6 bg-gray-800/50 rounded-lg p-4">
+          <div class="text-sm text-gray-400 mb-2">Time in Band</div>
+          <div class="text-3xl font-bold mb-3">
+            {{ timeInBand() }}s <span class="text-xl text-gray-400">/ {{ threshold() }}s</span>
+          </div>
+          
+          <!-- Progress bar -->
+          <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+            <div 
+              class="h-full smooth-transition"
+              [class.bg-green-500]="!thresholdMet()"
+              [class.bg-yellow-400]="thresholdMet()"
+              [style.width.%]="progress()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Band power meters -->
+      <div class="space-y-4">
+        <h2 class="text-lg font-semibold mb-3">Band Power Distribution</h2>
+        
+        @for (band of bandPowers(); track band.band) {
+          <div class="bg-gray-800 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <div 
+                  class="w-4 h-4 rounded"
+                  [style.background-color]="band.color">
+                </div>
+                <div>
+                  <div class="font-semibold">{{ band.label }}</div>
+                  <div class="text-sm text-gray-400">{{ band.range }}</div>
+                </div>
+              </div>
+              <div class="text-xl font-bold">{{ band.percentage }}%</div>
+            </div>
+            
+            <!-- Power bar -->
+            <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div 
+                class="h-full smooth-transition"
+                [style.background-color]="band.color"
+                [style.width.%]="band.percentage">
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>

@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.animate-alert-pulse {
+  animation: alertPulse 1s ease-in-out infinite;
+}
+
+@keyframes alertPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+}
+
+.smooth-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Ensure touch targets meet iOS guidelines */
+button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Prevent text selection on mobile */
+.text-select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}
