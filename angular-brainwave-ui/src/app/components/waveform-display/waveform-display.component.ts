@@ -12,7 +12,7 @@ import { BrainwaveService } from '../../services/brainwave.service';
         <h3 class="text-sm font-semibold text-gray-300">Live Signal</h3>
         <div class="text-xs text-gray-500">{{ fps() }} FPS</div>
       </div>
-      <canvas 
+      <canvas
         #waveformCanvas
         [width]="canvasWidth"
         [height]="canvasHeight"
@@ -37,15 +37,16 @@ import { BrainwaveService } from '../../services/brainwave.service';
 })
 export class WaveformDisplayComponent implements OnInit, OnDestroy {
   @ViewChild('waveformCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
-  
+
   private ctx!: CanvasRenderingContext2D;
   private animationId: number | null = null;
   private dataPoints: number[] = [];
   private maxDataPoints = 100; // Keep last 100 points for smooth scrolling
-  
+  private sampleRate = 250; // Hz - typical OpenBCI sample rate
+
   canvasWidth = 800;
-  canvasHeight = 80;
-  
+  canvasHeight = 120;
+
   fps = signal<number>(0);
   private frameCount = 0;
   private lastFpsUpdate = Date.now();
@@ -60,7 +61,7 @@ export class WaveformDisplayComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const canvas = this.canvasRef.nativeElement;
     this.ctx = canvas.getContext('2d')!;
-    
+
     // Subscribe to brainwave data
     this.brainwaveService.data$.subscribe(data => {
       // Use dominant band power as the wave value
@@ -80,7 +81,7 @@ export class WaveformDisplayComponent implements OnInit, OnDestroy {
 
   private addDataPoint(value: number): void {
     this.dataPoints.push(value);
-    
+
     // Keep only the last N points
     if (this.dataPoints.length > this.maxDataPoints) {
       this.dataPoints.shift();
@@ -105,8 +106,9 @@ export class WaveformDisplayComponent implements OnInit, OnDestroy {
 
     if (this.dataPoints.length < 2) return;
 
-    // Draw grid lines
+    // Draw grid lines and axis labels
     this.drawGrid(ctx, width, height);
+    this.drawAxisLabels(ctx, width, height);
 
     // Draw waveform
     const color = this.dominantColor();
@@ -128,7 +130,7 @@ export class WaveformDisplayComponent implements OnInit, OnDestroy {
     this.dataPoints.forEach((value, index) => {
       const x = index * pointSpacing;
       const y = centerY - (value * amplitude * 2 - amplitude); // Normalize to -1 to 1 range
-      
+
       if (index === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -143,7 +145,7 @@ export class WaveformDisplayComponent implements OnInit, OnDestroy {
     ctx.lineTo(width, centerY);
     ctx.lineTo(0, centerY);
     ctx.closePath();
-    
+
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
     gradient.addColorStop(0, color + '40');
     gradient.addColorStop(1, color + '05');
@@ -169,6 +171,39 @@ export class WaveformDisplayComponent implements OnInit, OnDestroy {
       ctx.lineTo(width, y);
       ctx.stroke();
     }
+  }
+
+  private drawAxisLabels(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.textAlign = 'left';
+
+    // Vertical axis labels (Power) - larger font
+    ctx.font = 'bold 14px sans-serif';
+    ctx.save();
+    ctx.translate(12, height / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Power', 0, 0);
+    ctx.restore();
+
+    // Vertical scale markers - larger font
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('1.0', width - 8, 16);
+    ctx.fillText('0.5', width - 8, height / 2 + 5);
+    ctx.fillText('0.0', width - 8, height - 22);
+
+    // Horizontal axis label (Time) - larger font
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    const timeSpan = this.maxDataPoints / this.sampleRate; // seconds
+    ctx.fillText(`Time (${timeSpan.toFixed(1)}s span)`, width / 2, height - 6);
+
+    // Time scale markers - larger font
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('0s', 8, height - 6);
+    ctx.textAlign = 'right';
+    ctx.fillText(`${timeSpan.toFixed(1)}s`, width - 8, height - 6);
   }
 
   private updateFps(): void {
