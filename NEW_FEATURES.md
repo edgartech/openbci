@@ -390,3 +390,292 @@ Live: Delta 2.1 Hz        ← Entering deep sleep
 - "The confidence stars help me know when I'm in a stable state"
 
 This makes the app **useful for actual neurofeedback training** rather than just a real-time monitor!
+
+---
+
+## ✅ 4. Data Backup & Restore (Export/Import)
+
+### What It Does
+Protects your data from being lost when switching browsers, devices, or clearing cache. Provides a simple way to backup and restore all your settings and session history.
+
+### The Problem We Solved
+All data is stored in browser localStorage, which means:
+- ❌ Switching browsers = lose all settings
+- ❌ Clearing cache = lose all data
+- ❌ New device = start from scratch
+- ❌ No cloud sync
+
+### The Solution: Export/Import System
+
+Located in **Settings → Data Management** section.
+
+#### **📤 Export (Backup)**
+**One-click download** of all your data:
+- ✅ Audio settings (presets, tones, custom files)
+- ✅ Alert thresholds (duration settings per band)
+- ✅ Session history (up to 100 sessions)
+- ✅ Session notes
+- ✅ Master volume & preferences
+
+**File Format:**
+- JSON file: `brainwave-backup-2025-10-14.json`
+- Human-readable
+- ~50KB-6MB typical size
+- Automatic timestamp in filename
+
+#### **📥 Import (Restore)**
+**Choose a backup file** to restore:
+- Validates file format before importing
+- Shows backup timestamp and confirmation
+- Replaces current data
+- Automatically reloads app with new data
+
+### Features
+
+1. **Smart Validation**
+   - Checks file is valid JSON
+   - Verifies backup structure
+   - Shows backup date before importing
+   - Prevents corrupted imports
+
+2. **User Feedback**
+   - Success/error messages
+   - Green checkmark on export success
+   - Confirmation dialog before import
+   - Clear instructions
+
+3. **Storage Info**
+   - Shows current storage usage
+   - Displays last backup date
+   - Helpful tips
+
+4. **Safety First**
+   - Confirmation required before overwrite
+   - Original data not deleted until import succeeds
+   - Auto-reload after import to ensure clean state
+
+### Use Cases
+
+**Scenario 1: Switching Browsers**
+```
+1. In Chrome: Export backup
+2. Switch to Safari
+3. Import backup
+4. ✅ All settings restored
+```
+
+**Scenario 2: New Device**
+```
+1. Old phone: Export backup
+2. Upload to Dropbox/email to self
+3. New phone: Download backup
+4. Import backup
+5. ✅ Identical setup on new device
+```
+
+**Scenario 3: Before Browser Cleanup**
+```
+1. Export backup (safety!)
+2. Clear browser data
+3. Import backup
+4. ✅ Back to normal
+```
+
+**Scenario 4: Share Configuration**
+```
+1. Configure perfect settings
+2. Export backup
+3. Send JSON file to friend
+4. They import it
+5. ✅ They get your exact setup
+```
+
+### Data Included in Backup
+
+```json
+{
+  "version": "1.0",
+  "timestamp": "2025-10-14T23:45:00.000Z",
+  "audio": {
+    "settings": "{...}",      // All per-band audio configs
+    "masterVolume": "80",     // Master volume level
+    "globalEnabled": "true"   // Audio on/off
+  },
+  "alerts": {
+    "thresholds": "{...}"     // Duration settings per band
+  },
+  "sessions": {
+    "sessions": "[{...}]"     // Session history array
+  }
+}
+```
+
+### Security & Privacy
+
+✅ **Completely Local**
+- No cloud upload
+- No external servers
+- File stays on your device
+- You control where it goes
+
+✅ **Privacy Protected**
+- Only contains app settings/data
+- No personal identifiable info
+- No tracking data
+- Just your brainwave session stats
+
+### Technical Details
+
+**New Service: `DataManagementService`**
+
+Key methods:
+```typescript
+exportData(): string              // Serialize all localStorage data
+downloadBackup(): void            // Trigger file download
+importData(json): Result          // Parse and restore data
+validateBackup(data): boolean     // Check file validity
+getStorageStats()                 // Calculate usage
+```
+
+**Storage Keys Included:**
+- `brainwave-audio-settings`
+- `brainwave-master-volume`
+- `brainwave-global-enabled`
+- `brainwave-thresholds`
+- `brainwave-sessions`
+
+**File Format:**
+- Standard JSON
+- Pretty-printed (readable)
+- Versioned (future compatibility)
+- Timestamped (know when created)
+
+**Validation:**
+- JSON parse check
+- Structure validation
+- Version compatibility check
+- Item count verification
+
+### UI Location
+
+**Settings Page → Scroll to Bottom**
+
+```
+┌─────────────────────────────────┐
+│ 💾 Data Management              │
+├─────────────────────────────────┤
+│                                 │
+│ 📤 Export Data                  │
+│ [ Download Backup ]             │
+│                                 │
+│ 📥 Import Data                  │
+│ [ Choose Backup File ]          │
+│                                 │
+│ Storage Used: 1.2 MB            │
+│ Last Backup: Oct 14, 2025       │
+│                                 │
+│ 💡 Tip: Export regularly...     │
+└─────────────────────────────────┘
+```
+
+### Mobile-Friendly
+
+✅ Touch-optimized buttons  
+✅ Clear visual feedback  
+✅ Native file picker integration  
+✅ Success/error messages easy to read  
+✅ No complex interactions  
+
+### Error Handling
+
+**Invalid file:**
+- "Please select a JSON backup file"
+- File picker clears automatically
+
+**Corrupted backup:**
+- "Invalid backup file format"
+- No data changed, safe to retry
+
+**Parse error:**
+- "Error reading backup file"
+- Original data intact
+
+**Import success:**
+- Shows success message
+- Auto-reloads after 1.5 seconds
+- Fresh app state with imported data
+
+---
+
+## 📋 Usage Instructions
+
+### How to Backup Your Data
+
+1. Open app settings (⚙️ icon)
+2. Scroll to **Data Management** section
+3. Click **Download Backup**
+4. File downloads as `brainwave-backup-YYYY-MM-DD.json`
+5. Store safely (cloud storage, email, USB, etc.)
+
+**When to backup:**
+- ✅ Before clearing browser data
+- ✅ After configuring perfect settings
+- ✅ Weekly if doing regular training
+- ✅ Before switching devices
+
+### How to Restore from Backup
+
+1. Open app settings (⚙️ icon)
+2. Scroll to **Data Management** section
+3. Click **Choose Backup File**
+4. Select your `.json` backup file
+5. Confirm the import dialog
+6. Wait for success message
+7. App reloads automatically with restored data
+
+**Important:**
+⚠️ Importing replaces ALL current data  
+⚠️ No undo - export current data first if needed  
+⚠️ Make sure you select the correct file  
+
+---
+
+## 🎯 Benefits
+
+### Before This Feature:
+- 😰 "I cleared my cache and lost everything!"
+- 😰 "Switched to Safari, all my settings gone!"
+- 😰 "Got a new phone, have to set it all up again!"
+- 😰 "Can't share my optimal setup with teammates"
+
+### After This Feature:
+- ✅ "Backed up before clearing cache - restored in 5 seconds!"
+- ✅ "Exported from Chrome, imported to Safari - seamless!"
+- ✅ "New phone setup in 10 seconds with my backup!"
+- ✅ "Shared my config file with the team - everyone has it now!"
+
+### Real-World Value:
+
+1. **Peace of Mind** - Data is safe, recoverable
+2. **Device Freedom** - Move between devices easily
+3. **Browser Independence** - Not locked to one browser
+4. **Shareability** - Help others with your setup
+5. **Experimentation** - Try settings, revert if needed
+6. **Disaster Recovery** - Quick restore after issues
+
+---
+
+## 💾 Storage Considerations
+
+**Typical Backup Sizes:**
+- Settings only: ~6KB
+- Settings + 10 sessions: ~20KB
+- Settings + 100 sessions: ~100KB
+- Settings + 100 sessions + custom audio: up to 6MB
+
+**LocalStorage Limits:**
+- Web: 5-10MB (plenty of room)
+- PWA: 50MB (more than enough)
+
+**Recommendation:**
+Keep backups in cloud storage (Dropbox, Google Drive, iCloud) for safekeeping.

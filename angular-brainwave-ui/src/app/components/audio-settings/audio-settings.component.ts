@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AudioService, AudioConfig } from '../../services/audio.service';
 import { AlertService } from '../../services/alert.service';
 import { BrainwaveBand, BAND_INFO } from '../../services/brainwave.service';
+import { DataManagementService } from '../../services/data-management.service';
 
 @Component({
   selector: 'app-audio-settings',
@@ -14,6 +15,8 @@ import { BrainwaveBand, BAND_INFO } from '../../services/brainwave.service';
 })
 export class AudioSettingsComponent {
   selectedBand = signal<BrainwaveBand | null>(null);
+  importMessage = signal<string>('');
+  importSuccess = signal<boolean>(false);
   
   bands: BrainwaveBand[] = ['delta', 'theta', 'alpha', 'beta', 'gamma'];
   
@@ -21,7 +24,8 @@ export class AudioSettingsComponent {
 
   constructor(
     public audioService: AudioService,
-    public alertService: AlertService
+    public alertService: AlertService,
+    public dataManagementService: DataManagementService
   ) {}
 
   get presetSounds(): string[] {
@@ -141,5 +145,92 @@ export class AudioSettingsComponent {
       this.audioService.resetToDefaults();
       this.alertService.resetThresholds();
     }
+  }
+
+  // Data management methods
+  exportData(): void {
+    try {
+      this.dataManagementService.downloadBackup();
+      this.dataManagementService.updateLastBackupTimestamp();
+      this.importMessage.set('Backup downloaded successfully!');
+      this.importSuccess.set(true);
+      setTimeout(() => this.importMessage.set(''), 3000);
+    } catch (error) {
+      this.importMessage.set('Error creating backup. Please try again.');
+      this.importSuccess.set(false);
+      setTimeout(() => this.importMessage.set(''), 3000);
+    }
+  }
+
+  async importData(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    
+    if (!file) return;
+
+    // Validate file type
+    if (!file.name.endsWith('.json')) {
+      this.importMessage.set('Please select a JSON backup file');
+      this.importSuccess.set(false);
+      setTimeout(() => this.importMessage.set(''), 3000);
+      input.value = '';
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      
+      // Get backup info first
+      const info = this.dataManagementService.getBackupInfo(text);
+      
+      if (!info.valid) {
+        this.importMessage.set('Invalid backup file format');
+        this.importSuccess.set(false);
+        setTimeout(() => this.importMessage.set(''), 3000);
+        input.value = '';
+        return;
+      }
+
+      // Confirm before importing
+      const confirmMessage = `Import backup from ${new Date(info.timestamp!).toLocaleString()}?\n\nThis will replace your current settings.`;
+      if (!confirm(confirmMessage)) {
+        input.value = '';
+        return;
+      }
+
+      // Import the data
+      const result = this.dataManagementService.importData(text);
+      
+      if (result.success) {
+        this.importMessage.set(result.message);
+        this.importSuccess.set(true);
+        
+        // Reload services to reflect imported data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        this.importMessage.set(result.message);
+        this.importSuccess.set(false);
+        setTimeout(() => this.importMessage.set(''), 3000);
+      }
+    } catch (error) {
+      this.importMessage.set('Error reading backup file');
+      this.importSuccess.set(false);
+      setTimeout(() => this.importMessage.set(''), 3000);
+    }
+    
+    input.value = '';
+  }
+
+  getLastBackupDate(): string {
+    const timestamp = this.dataManagementService.getLastBackupTimestamp();
+    if (!timestamp) return 'Never';
+    return new Date(timestamp).toLocaleString();
+  }
+
+  getStorageInfo(): string {
+    const stats = this.dataManagementService.getStorageStats();
+    return stats.formattedTotal;
   }
 }

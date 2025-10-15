@@ -25,6 +25,7 @@ A real-time brainwave visualization system with customizable audio alerts. This 
   - Individual volume control per band
 - **Duration Thresholds**: Configure minimum time (0-30 seconds) in a band before alert triggers
 - **Progress Indicators**: Visual feedback showing time in band vs. threshold
+- **Data Backup & Restore**: Export/import all settings and session history as JSON files
 - **Mobile-First Design**: Optimized for touch interfaces and iOS devices
 - **Dark Theme**: High-contrast UI optimized for extended viewing
 - **LocalStorage Persistence**: Settings saved across sessions
