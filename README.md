@@ -12,6 +12,10 @@ A real-time brainwave visualization system with customizable audio alerts. This 
 - **Band Tracking**: Monitors time spent in each brainwave band
 
 ### Frontend (Angular 20)
+- **Two-Tier State Display**: 
+  - Primary state (30s rolling average) for stable brain state representation
+  - Live/current state for instant feedback
+  - Confidence indicators showing state stability
 - **Real-time Visualization**: Live display of dominant brainwave band with smooth color transitions
 - **Band Power Meters**: Visual representation of all 5 brainwave bands with percentages
 - **Customizable Audio Alerts**: Per-band audio configuration with multiple options:

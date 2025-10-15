@@ -20,20 +20,69 @@ export class BrainwaveDashboardComponent implements OnInit {
   isRecording = computed(() => this.sessionService.isRecording());
   
   // Computed properties for reactive UI updates
+  // Current (instantaneous) dominant band - used for alerts
   dominantBand = computed(() => {
     const data = this.brainwaveService.currentData();
     return data?.dominantBand || 'none';
   });
 
-  dominantBandLabel = computed(() => 
+  // Primary state (30s rolling average) - stable representation
+  primaryState = computed(() => this.brainwaveService.primaryState());
+
+  primaryBand = computed(() => {
+    const primary = this.primaryState();
+    return primary?.primaryBand || 'none';
+  });
+
+  primaryBandLabel = computed(() => 
+    this.brainwaveService.getBandLabel(this.primaryBand())
+  );
+
+  primaryBandRange = computed(() => 
+    this.brainwaveService.getBandRange(this.primaryBand())
+  );
+
+  primaryBandColor = computed(() => 
+    this.brainwaveService.getBandColor(this.primaryBand())
+  );
+
+  primaryPercentage = computed(() => {
+    const primary = this.primaryState();
+    return primary ? Math.round(primary.percentage * 100) : 0;
+  });
+
+  primaryDuration = computed(() => {
+    const primary = this.primaryState();
+    return primary?.duration.toFixed(1) || '0.0';
+  });
+
+  primaryConfidence = computed(() => {
+    const primary = this.primaryState();
+    return primary?.confidence || 'low';
+  });
+
+  primaryDistribution = computed(() => {
+    const primary = this.primaryState();
+    if (!primary) return [];
+
+    return Object.keys(primary.distribution).map(band => ({
+      band: band as BrainwaveBand,
+      label: BAND_INFO[band as BrainwaveBand].label,
+      color: BAND_INFO[band as BrainwaveBand].color,
+      percentage: Math.round(primary.distribution[band as BrainwaveBand] * 100)
+    })).sort((a, b) => b.percentage - a.percentage);
+  });
+
+  // Keep these for the current/live display
+  currentBandLabel = computed(() => 
     this.brainwaveService.getBandLabel(this.dominantBand())
   );
 
-  dominantBandRange = computed(() => 
+  currentBandRange = computed(() => 
     this.brainwaveService.getBandRange(this.dominantBand())
   );
 
-  dominantBandColor = computed(() => 
+  currentBandColor = computed(() => 
     this.brainwaveService.getBandColor(this.dominantBand())
   );
 
