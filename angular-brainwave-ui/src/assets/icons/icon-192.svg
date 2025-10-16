@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <!-- Background -->
+  <rect width="192" height="192" fill="#1F2937" rx="24"/>
+  
+  <!-- Main brain wave pattern -->
+  <path d="M 30 96 Q 45 70, 60 96 T 90 96 Q 105 125, 120 96 T 150 96 Q 160 70, 162 96" 
+        fill="none" 
+        stroke="#10B981" 
+        stroke-width="8" 
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  
+  <!-- Secondary wave -->
+  <path d="M 30 115 Q 50 130, 70 115 T 120 115 Q 140 100, 162 115" 
+        fill="none" 
+        stroke="#34D399" 
+        stroke-width="5" 
+        stroke-linecap="round"
+        opacity="0.6"/>
+  
+  <!-- Tertiary wave -->
+  <path d="M 30 77 Q 55 60, 80 77 T 130 77 Q 150 90, 162 77" 
+        fill="none" 
+        stroke="#6EE7B7" 
+        stroke-width="5" 
+        stroke-linecap="round"
+        opacity="0.4"/>
+  
+  <!-- Data points -->
+  <circle cx="60" cy="96" r="5" fill="#10B981"/>
+  <circle cx="90" cy="96" r="5" fill="#10B981"/>
+  <circle cx="120" cy="96" r="5" fill="#10B981"/>
+  
+  <!-- Brain icon suggestion (simplified) -->
+  <circle cx="96" cy="145" r="8" fill="#10B981" opacity="0.3"/>
+  <path d="M 88 145 Q 92 135, 96 145 T 104 145" 
+        fill="none" 
+        stroke="#10B981" 
+        stroke-width="2" 
+        opacity="0.5"/>
+</svg>

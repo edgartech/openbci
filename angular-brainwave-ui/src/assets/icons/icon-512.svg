@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1F2937;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#111827;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="512" height="512" fill="url(#bgGrad)" rx="64"/>
+  
+  <!-- Main EEG wave pattern -->
+  <path d="M 80 256 Q 120 180, 160 256 T 240 256 Q 280 340, 320 256 T 400 256 Q 430 180, 432 256" 
+        fill="none" 
+        stroke="#10B981" 
+        stroke-width="20" 
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  
+  <!-- Secondary wave (Theta-like) -->
+  <path d="M 80 310 Q 130 350, 180 310 T 320 310 Q 370 270, 432 310" 
+        fill="none" 
+        stroke="#34D399" 
+        stroke-width="14" 
+        stroke-linecap="round"
+        opacity="0.6"/>
+  
+  <!-- Tertiary wave (Alpha-like) -->
+  <path d="M 80 202 Q 145 160, 210 202 T 350 202 Q 400 240, 432 202" 
+        fill="none" 
+        stroke="#6EE7B7" 
+        stroke-width="12" 
+        stroke-linecap="round"
+        opacity="0.4"/>
+  
+  <!-- Data points with glow -->
+  <circle cx="160" cy="256" r="12" fill="#10B981">
+    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="240" cy="256" r="12" fill="#10B981">
+    <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="320" cy="256" r="12" fill="#10B981">
+    <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Small frequency indicators -->
+  <circle cx="256" cy="390" r="20" fill="#10B981" opacity="0.3"/>
+  <path d="M 236 390 Q 246 370, 256 390 T 276 390" 
+        fill="none" 
+        stroke="#10B981" 
+        stroke-width="4" 
+        opacity="0.5"/>
+</svg>

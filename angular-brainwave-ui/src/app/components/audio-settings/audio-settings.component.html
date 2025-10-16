@@ -2,14 +2,14 @@
   <div class="max-w-2xl mx-auto">
     
     <!-- Header -->
-    <div class="mb-6">
+    <div class="mb-6" role="heading" aria-level="1">
       <h1 class="text-2xl font-bold mb-2">Audio & Alert Settings</h1>
       <p class="text-gray-400">Configure sounds and duration thresholds for each brainwave band</p>
     </div>
 
     <!-- Global controls -->
-    <div class="bg-gray-800 rounded-lg p-4 mb-6">
-      <h2 class="text-lg font-semibold mb-4">Global Controls</h2>
+    <div class="bg-gray-800 rounded-lg p-4 mb-6" role="region" aria-labelledby="global-controls-heading">
+      <h2 class="text-lg font-semibold mb-4" id="global-controls-heading">Global Controls</h2>
       
       <!-- Master volume -->
       <div class="mb-4">
@@ -23,7 +23,12 @@
           max="100" 
           [value]="audioService.masterVolume()"
           (input)="updateMasterVolume(+$any($event.target).value)"
-          class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+          class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+          aria-label="Master volume control"
+          [attr.aria-valuenow]="audioService.masterVolume()"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuetext]="audioService.masterVolume() + ' percent'">
       </div>
 
       <!-- Global enable/disable -->
@@ -34,20 +39,23 @@
           [class]="audioService.globalEnabled() 
             ? 'bg-green-600 hover:bg-green-700' 
             : 'bg-gray-600 hover:bg-gray-500'"
-          class="touch-target px-4 py-2 rounded-lg font-medium transition-colors">
+          class="touch-target px-4 py-2 rounded-lg font-medium transition-colors"
+          role="switch"
+          [attr.aria-checked]="audioService.globalEnabled()"
+          [attr.aria-label]="'Enable all sounds: ' + (audioService.globalEnabled() ? 'Enabled' : 'Disabled')">
           {{ audioService.globalEnabled() ? 'Enabled' : 'Disabled' }}
         </button>
       </div>
     </div>
 
     <!-- Dominant Frequency Alerts -->
-    <div class="bg-gray-800 rounded-lg p-4 mb-6 border-2 border-purple-500/30">
+    <div class="bg-gray-800 rounded-lg p-4 mb-6 border-2 border-purple-500/30" role="region" aria-labelledby="dominant-alerts-heading">
       <div class="flex items-center gap-2 mb-3">
         <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
             d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
-        <h2 class="text-lg font-semibold">Dominant Frequency Alerts</h2>
+        <h2 class="text-lg font-semibold" id="dominant-alerts-heading">Dominant Frequency Alerts</h2>
       </div>
       <p class="text-sm text-gray-400 mb-4">
         Alert when the primary/dominant band (30-second average) changes. More stable than live alerts.
@@ -61,7 +69,10 @@
           [class]="alertService.dominantAlertSettings().enabled 
             ? 'bg-purple-600 hover:bg-purple-700' 
             : 'bg-gray-600 hover:bg-gray-500'"
-          class="touch-target px-4 py-2 rounded-lg font-medium transition-colors">
+          class="touch-target px-4 py-2 rounded-lg font-medium transition-colors"
+          role="switch"
+          [attr.aria-checked]="alertService.dominantAlertSettings().enabled"
+          [attr.aria-label]="'Dominant alerts: ' + (alertService.dominantAlertSettings().enabled ? 'Enabled' : 'Disabled')">
           {{ alertService.dominantAlertSettings().enabled ? 'Enabled' : 'Disabled' }}
         </button>
       </div>

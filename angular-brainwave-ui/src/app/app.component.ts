@@ -1,16 +1,26 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrainwaveDashboardComponent } from './components/brainwave-dashboard/brainwave-dashboard.component';
 import { AudioSettingsComponent } from './components/audio-settings/audio-settings.component';
 import { SessionHistoryComponent } from './components/session-history/session-history.component';
 import { DocumentationComponent } from './components/documentation/documentation.component';
+import { ErrorBoundaryComponent, ErrorState } from './components/error-boundary/error-boundary.component';
+import { BrainwaveService } from './services/brainwave.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, BrainwaveDashboardComponent, AudioSettingsComponent, SessionHistoryComponent, DocumentationComponent],
+  imports: [CommonModule, BrainwaveDashboardComponent, AudioSettingsComponent, SessionHistoryComponent, DocumentationComponent, ErrorBoundaryComponent],
   template: `
-    <div class="app-container">
+    <!-- Error Boundary - Shows on critical errors -->
+    @if (hasError()) {
+      <app-error-boundary 
+        [error]="errorState"
+        [onRetry]="handleRetry"
+        [onReload]="handleReload" />
+    }
+    
+    <div class="app-container" [class.hidden]="hasError()">
       @if (currentView() === 'dashboard') {
         <app-brainwave-dashboard 
           (settingsClick)="showSettings()" 
@@ -75,10 +85,46 @@ import { DocumentationComponent } from './components/documentation/documentation
       min-width: 44px;
       min-height: 44px;
     }
+
+    .hidden {
+      display: none !important;
+    }
   `]
 })
 export class AppComponent {
   currentView = signal<'dashboard' | 'settings' | 'history' | 'docs'>('dashboard');
+
+  constructor(private brainwaveService: BrainwaveService) {}
+
+  // Error boundary state
+  hasError = computed(() => this.brainwaveService.criticalError() !== null);
+  
+  errorState = computed((): ErrorState => {
+    const error = this.brainwaveService.criticalError();
+    if (!error) {
+      return {
+        type: 'unknown',
+        message: '',
+        recoverable: false
+      };
+    }
+    
+    return {
+      type: error.type,
+      message: error.message,
+      details: error.details,
+      recoverable: true
+    };
+  });
+
+  handleRetry = (): void => {
+    this.brainwaveService.resetError();
+    this.brainwaveService.connect();
+  };
+
+  handleReload = (): void => {
+    window.location.reload();
+  };
 
   showDashboard(): void {
     this.currentView.set('dashboard');

@@ -2,6 +2,13 @@ import { Injectable, signal } from '@angular/core';
 import { Observable, Subject, timer } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export interface CriticalError {
+  type: 'connection' | 'websocket';
+  message: string;
+  details?: string;
+  timestamp: number;
+}
+
 export interface BandPowers {
   delta: number;
   theta: number;
@@ -61,6 +68,7 @@ export class BrainwaveService {
   connectionStatus = signal<'connected' | 'disconnected' | 'connecting' | 'error'>('disconnected');
   currentData = signal<BrainwaveData | null>(null);
   primaryState = signal<PrimaryState | null>(null);
+  criticalError = signal<CriticalError | null>(null);
   data$ = this.dataSubject.asObservable();
 
   // Primary state tracking
@@ -124,7 +132,18 @@ export class BrainwaveService {
       });
     } else {
       console.error('Max reconnection attempts reached');
+      this.criticalError.set({
+        type: 'websocket',
+        message: 'Unable to connect to the backend server after multiple attempts.',
+        details: `Failed to connect to ${environment.websocketUrl}. Maximum retry attempts (${this.maxReconnectAttempts}) exceeded.`,
+        timestamp: Date.now()
+      });
     }
+  }
+
+  resetError(): void {
+    this.criticalError.set(null);
+    this.reconnectAttempts = 0;
   }
 
   disconnect(): void {
