@@ -38,12 +38,9 @@ const PRESET_SOUNDS = [
   'theta',
   'alpha',
   'beta',
-  'gamma',
-  'beep',
-  'chime',
-  'bell',
-  'tone',
-  'click'
+  'gamma'
+  // Note: Add additional preset sounds here (beep, chime, bell, tone, click)
+  // after adding the corresponding MP3 files to public/assets/sounds/
 ];
 
 @Injectable({
@@ -79,8 +76,13 @@ export class AudioService {
 
   private preloadPresetSounds(): void {
     PRESET_SOUNDS.forEach(sound => {
-      const audio = new Audio(`assets/sounds/${sound}.mp3`);
+      // Capitalize first letter to match actual filenames (Alpha.mp3, Beta.mp3, etc.)
+      const fileName = sound.charAt(0).toUpperCase() + sound.slice(1);
+      const audio = new Audio(`assets/sounds/${fileName}.mp3`);
       audio.preload = 'auto';
+      audio.onerror = () => {
+        console.warn(`Could not load preset sound: assets/sounds/${fileName}.mp3`);
+      };
       this.preloadedAudio.set(sound, audio);
     });
   }
@@ -160,11 +162,13 @@ export class AudioService {
       const clone = audio.cloneNode() as HTMLAudioElement;
       clone.volume = volume;
       clone.play().catch(err => {
+        const fileName = soundName.charAt(0).toUpperCase() + soundName.slice(1);
         console.error(`Error playing preset sound '${soundName}':`, err);
-        console.warn(`Preset audio file might be missing: assets/sounds/${soundName}.mp3`);
+        console.warn(`Preset audio file might be missing: assets/sounds/${fileName}.mp3`);
       });
     } else {
-      console.error(`Preset sound '${soundName}' not found. Add file: assets/sounds/${soundName}.mp3`);
+      const fileName = soundName.charAt(0).toUpperCase() + soundName.slice(1);
+      console.error(`Preset sound '${soundName}' not found. Add file: assets/sounds/${fileName}.mp3`);
     }
   }
 
@@ -176,11 +180,13 @@ export class AudioService {
       clone.playbackRate = pitchMultiplier; // Change pitch by adjusting playback speed
       clone.preservesPitch = false; // Ensure pitch changes with speed
       clone.play().catch(err => {
+        const fileName = soundName.charAt(0).toUpperCase() + soundName.slice(1);
         console.error(`Error playing preset sound '${soundName}' with pitch:`, err);
-        console.warn(`Preset audio file might be missing: assets/sounds/${soundName}.mp3`);
+        console.warn(`Preset audio file might be missing: assets/sounds/${fileName}.mp3`);
       });
     } else {
-      console.error(`Preset sound '${soundName}' not found. Add file: assets/sounds/${soundName}.mp3`);
+      const fileName = soundName.charAt(0).toUpperCase() + soundName.slice(1);
+      console.error(`Preset sound '${soundName}' not found. Add file: assets/sounds/${fileName}.mp3`);
     }
   }
 
@@ -351,5 +357,36 @@ export class AudioService {
     this.masterVolume.set(100);
     this.globalEnabled.set(true);
     this.saveSettings();
+  }
+
+  testDominantSound(audioMode: string, pitchShift: number): void {
+    // Ensure audio context is resumed (required for iOS)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
+    
+    // Use master volume for the test
+    const effectiveVolume = this.masterVolume() / 100;
+    
+    // Determine pitch multiplier based on audio mode
+    let pitchMultiplier = 1.0;
+    
+    if (audioMode === 'pitch-higher' || audioMode === 'pitch-lower') {
+      pitchMultiplier = pitchShift / 100; // Convert percentage to multiplier
+    }
+    
+    // Play the Test.mp3 file with the configured pitch
+    const audio = new Audio('assets/sounds/Test.mp3');
+    audio.volume = effectiveVolume;
+    
+    if (audioMode !== 'same-as-live') {
+      audio.playbackRate = pitchMultiplier;
+      audio.preservesPitch = false; // Ensure pitch changes with speed
+    }
+    
+    audio.play().catch(err => {
+      console.error('Error playing dominant test sound:', err);
+      console.warn('Test audio file might be missing: assets/sounds/Test.mp3');
+    });
   }
 }

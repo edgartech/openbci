@@ -92,7 +92,9 @@
             <select 
               [value]="alertService.dominantAlertSettings().confidenceLevel"
               (change)="updateDominantConfidenceLevel($any($event.target).value)"
-              class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm mb-2">
+              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm"
+              aria-label="Confidence level for dominant alerts"
+              id="confidence-level-select">
               <option value="any">1 Star+ (Any)</option>
               <option value="moderate-plus">2 Stars+ (Moderate+)</option>
               <option value="high-plus">3 Stars+ (High+)</option>
@@ -115,7 +117,9 @@
             <select 
               [value]="alertService.dominantAlertSettings().audioMode"
               (change)="updateDominantAudioMode($any($event.target).value)"
-              class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm mb-2">
+              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm"
+              aria-label="Audio distinction mode for dominant alerts"
+              id="audio-mode-select">
               <option value="same-as-live">Same as Live Alerts</option>
               <option value="pitch-higher">Higher Pitch (Recommended)</option>
               <option value="pitch-lower">Lower Pitch</option>
@@ -141,7 +145,13 @@
                 step="5"
                 [value]="alertService.dominantAlertSettings().pitchShift"
                 (input)="updateDominantPitchShift(+$any($event.target).value)"
-                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                aria-label="Pitch shift percentage"
+                [attr.aria-valuenow]="alertService.dominantAlertSettings().pitchShift"
+                aria-valuemin="50"
+                aria-valuemax="200"
+                [attr.aria-valuetext]="alertService.dominantAlertSettings().pitchShift + ' percent'"
+                id="pitch-shift-slider">
               <div class="flex justify-between text-xs text-gray-500 mt-1">
                 <span>Lower (50%)</span>
                 <span>Normal (100%)</span>
@@ -169,9 +179,32 @@
               step="1"
               [value]="alertService.dominantAlertSettings().cooldownSeconds"
               (input)="updateDominantCooldown(+$any($event.target).value)"
-              class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+              class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              aria-label="Cooldown period in seconds"
+              [attr.aria-valuenow]="alertService.dominantAlertSettings().cooldownSeconds"
+              aria-valuemin="0"
+              aria-valuemax="60"
+              [attr.aria-valuetext]="alertService.dominantAlertSettings().cooldownSeconds + ' seconds'"
+              id="cooldown-slider">
             <p class="text-xs text-gray-500 mt-1">
               Minimum time between alerts to prevent rapid re-triggering
+            </p>
+          </div>
+
+          <!-- Test Sound Button -->
+          <div>
+            <button
+              (click)="testDominantSound()"
+              class="w-full touch-target px-4 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+              aria-label="Test dominant frequency alert sound with current settings">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              </svg>
+              Test Sound
+            </button>
+            <p class="text-xs text-gray-500 mt-2">
+              Preview how the dominant frequency alert will sound with your current audio distinction and pitch shift settings
             </p>
           </div>
 
@@ -255,7 +288,13 @@
                     step="0.5"
                     [value]="getThreshold(band).duration"
                     (input)="updateThresholdDuration(band, +$any($event.target).value)"
-                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    [attr.aria-label]="'Duration threshold for ' + getBandInfo(band).label + ' band'"
+                    [attr.aria-valuenow]="getThreshold(band).duration"
+                    aria-valuemin="0"
+                    aria-valuemax="30"
+                    [attr.aria-valuetext]="getThreshold(band).duration + ' seconds'"
+                    [attr.id]="band + '-duration-slider'">
                   <p class="text-xs text-gray-500 mt-1">
                     Alert triggers after staying in this band for the set duration
                   </p>
@@ -266,7 +305,9 @@
                     type="checkbox" 
                     [checked]="getThreshold(band).enabled"
                     (change)="updateThresholdEnabled(band, $any($event.target).checked)"
-                    class="w-4 h-4 rounded">
+                    class="w-4 h-4 rounded"
+                    [attr.aria-label]="'Enable alerts for ' + getBandInfo(band).label + ' band'"
+                    [attr.id]="band + '-threshold-checkbox'">
                   <span class="text-sm">Enable threshold alerts for this band</span>
                 </label>
               </div>
@@ -280,7 +321,9 @@
                     [class]="getBandConfig(band).sourceType === 'preset' 
                       ? 'bg-blue-600 border-blue-500' 
                       : 'bg-gray-700 border-gray-600'"
-                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors">
+                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors"
+                    [attr.aria-label]="'Use preset sound for ' + getBandInfo(band).label + ' band'"
+                    [attr.aria-pressed]="getBandConfig(band).sourceType === 'preset'">
                     Preset
                   </button>
                   <button
@@ -288,7 +331,9 @@
                     [class]="getBandConfig(band).sourceType === 'tone' 
                       ? 'bg-blue-600 border-blue-500' 
                       : 'bg-gray-700 border-gray-600'"
-                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors">
+                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors"
+                    [attr.aria-label]="'Generate tone for ' + getBandInfo(band).label + ' band'"
+                    [attr.aria-pressed]="getBandConfig(band).sourceType === 'tone'">
                     Tone
                   </button>
                   <button
@@ -296,15 +341,19 @@
                     [class]="getBandConfig(band).sourceType === 'custom' 
                       ? 'bg-blue-600 border-blue-500' 
                       : 'bg-gray-700 border-gray-600'"
-                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors">
+                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors"
+                    [attr.aria-label]="'Upload custom sound for ' + getBandInfo(band).label + ' band'"
+                    [attr.aria-pressed]="getBandConfig(band).sourceType === 'custom'">
                     Custom
                   </button>
                   <button
                     (click)="updateSourceType(band, 'disabled')"
                     [class]="getBandConfig(band).sourceType === 'disabled' 
-                      ? 'bg-red-600 border-red-500' 
+                      ? 'bg-blue-600 border-blue-500' 
                       : 'bg-gray-700 border-gray-600'"
-                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors">
+                    class="touch-target px-3 py-2 rounded border-2 text-sm font-medium transition-colors"
+                    [attr.aria-label]="'Disable alerts for ' + getBandInfo(band).label + ' band'"
+                    [attr.aria-pressed]="getBandConfig(band).sourceType === 'disabled'">
                     Disabled
                   </button>
                 </div>
@@ -315,11 +364,15 @@
                 <div>
                   <label class="text-sm font-medium mb-2 block">Preset Sound</label>
                   <select 
-                    [value]="getBandConfig(band).presetSound"
+                    [value]="getBandConfig(band).presetSound || band"
                     (change)="updatePresetSound(band, $any($event.target).value)"
-                    class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
+                    class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
+                    [attr.aria-label]="'Select preset sound for ' + getBandInfo(band).label + ' band'"
+                    [attr.id]="band + '-preset-select'">
                     @for (sound of presetSounds; track sound) {
-                      <option [value]="sound">{{ sound }}</option>
+                      <option [value]="sound" [selected]="getBandConfig(band).presetSound === sound">
+                        {{ sound.charAt(0).toUpperCase() + sound.slice(1) }}
+                      </option>
                     }
                   </select>
                 </div>
@@ -340,7 +393,13 @@
                       step="10"
                       [value]="getBandConfig(band).toneFrequency"
                       (input)="updateToneFrequency(band, +$any($event.target).value)"
-                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      [attr.aria-label]="'Tone frequency for ' + getBandInfo(band).label + ' band'"
+                      [attr.aria-valuenow]="getBandConfig(band).toneFrequency"
+                      aria-valuemin="100"
+                      aria-valuemax="2000"
+                      [attr.aria-valuetext]="getBandConfig(band).toneFrequency + ' hertz'"
+                      [attr.id]="band + '-frequency-slider'">
                   </div>
 
                   <div>
@@ -348,7 +407,9 @@
                     <select 
                       [value]="getBandConfig(band).toneType"
                       (change)="updateToneType(band, $any($event.target).value)"
-                      class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
+                      class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
+                      [attr.aria-label]="'Wave type for ' + getBandInfo(band).label + ' band'"
+                      [attr.id]="band + '-wavetype-select'">
                       @for (type of oscillatorTypes; track type) {
                         <option [value]="type">{{ type }}</option>
                       }
@@ -367,7 +428,13 @@
                       step="50"
                       [value]="getBandConfig(band).toneDuration"
                       (input)="updateToneDuration(band, +$any($event.target).value)"
-                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      [attr.aria-label]="'Tone duration for ' + getBandInfo(band).label + ' band'"
+                      [attr.aria-valuenow]="getBandConfig(band).toneDuration"
+                      aria-valuemin="50"
+                      aria-valuemax="2000"
+                      [attr.aria-valuetext]="getBandConfig(band).toneDuration + ' milliseconds'"
+                      [attr.id]="band + '-duration-slider'">
                   </div>
                 </div>
               }
@@ -402,7 +469,9 @@
                       type="file" 
                       accept="audio/*"
                       (change)="onFileSelected(band, $event)"
-                      class="hidden">
+                      class="hidden"
+                      [attr.aria-label]="'Upload audio file for ' + getBandInfo(band).label + ' band'"
+                      [attr.id]="band + '-file-input'">
                     <div class="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-gray-500 transition-colors">
                       <svg class="w-8 h-8 mx-auto mb-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -427,14 +496,21 @@
                   max="100" 
                   [value]="getBandConfig(band).volume"
                   (input)="updateVolume(band, +$any($event.target).value)"
-                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  [attr.aria-label]="'Volume level for ' + getBandInfo(band).label + ' band'"
+                  [attr.aria-valuenow]="getBandConfig(band).volume"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [attr.aria-valuetext]="getBandConfig(band).volume + ' percent'"
+                  [attr.id]="band + '-volume-slider'">
               </div>
 
               <!-- Test button -->
               <div class="flex gap-2">
                 <button
                   (click)="testSound(band)"
-                  class="touch-target flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors">
+                  class="touch-target flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors"
+                  [attr.aria-label]="'Test sound for ' + getBandInfo(band).label + ' band'">
                   Test Sound
                 </button>
               </div>
@@ -486,11 +562,8 @@
         </p>
         <button
           (click)="exportData()"
-          class="touch-target w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+          class="w-full touch-target px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
+          aria-label="Download backup of all settings and sessions">
           Download Backup
         </button>
       </div>
@@ -507,17 +580,16 @@
         <p class="text-xs text-gray-400 mb-3">
           Restore from a previous backup file (replaces current data)
         </p>
-        <label class="touch-target w-full px-4 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
-          Choose Backup File
-          <input
-            type="file"
+        <label class="block w-full touch-target px-4 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors text-center cursor-pointer"
+               for="import-backup-input">
+          Import Backup
+          <input 
+            type="file" 
             accept=".json"
             (change)="importData($event)"
-            class="hidden">
+            class="hidden"
+            aria-label="Select backup JSON file to import"
+            id="import-backup-input">
         </label>
       </div>
 
@@ -543,9 +615,48 @@
     <div class="mt-6">
       <button
         (click)="resetAllSettings()"
-        class="touch-target w-full px-4 py-3 bg-red-900/30 hover:bg-red-900/50 border border-red-700 rounded-lg font-medium transition-colors">
+        class="touch-target w-full px-4 py-3 bg-red-900/30 hover:bg-red-900/50 border border-red-700 rounded-lg font-medium transition-colors"
+        aria-label="Reset all settings to default values">
         Reset All Settings to Defaults
       </button>
+    </div>
+
+    <!-- Footer: Version & Disclaimer -->
+    <div class="mt-8 pt-6 border-t border-gray-700 space-y-3">
+      <div class="text-center text-xs text-gray-500">
+        <p class="font-medium">OpenBCI Brainwave Monitor v{{ version }}</p>
+      </div>
+      
+      <div class="text-center text-xs text-gray-500">
+        <button 
+          (click)="showDisclaimer = !showDisclaimer"
+          class="cursor-pointer hover:text-gray-400 transition-colors inline-flex items-center gap-1"
+          aria-expanded="{{showDisclaimer}}"
+          aria-label="Toggle medical disclaimer">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Medical Disclaimer
+          <svg class="w-3 h-3 transition-transform" [class.rotate-180]="showDisclaimer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        @if (showDisclaimer) {
+          <div class="mt-3 p-3 bg-gray-800/50 rounded text-left border border-yellow-600/30">
+            <p class="mb-2">⚠️ <strong>For Research & Educational Use Only</strong></p>
+            <p class="text-gray-400 leading-relaxed">
+              This software is not a medical device and has not been evaluated by the FDA. 
+              It is not intended to diagnose, treat, cure, or prevent any disease or medical condition. 
+              Consult qualified healthcare professionals for medical advice. Use at your own risk.
+            </p>
+            <p class="mt-2 text-gray-500">
+              Licensed under MIT License. See LICENSE file for details.
+            </p>
+          </div>
+        }
+      </div>
     </div>
   </div>
 </div>

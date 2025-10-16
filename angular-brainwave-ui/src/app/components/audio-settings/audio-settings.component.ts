@@ -1,24 +1,26 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { AudioService, AudioConfig } from '../../services/audio.service';
-import { AlertService, ConfidenceLevel, DominantAudioMode } from '../../services/alert.service';
-import { BrainwaveBand, BAND_INFO } from '../../services/brainwave.service';
+import { AudioService, AudioSourceType, AudioConfig } from '../../services/audio.service';
+import { AlertService, DominantAudioMode, ConfidenceLevel } from '../../services/alert.service';
 import { DataManagementService } from '../../services/data-management.service';
+import { BrainwaveBand, BAND_INFO } from '../../services/brainwave.service';
 
 @Component({
   selector: 'app-audio-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './audio-settings.component.html',
   styleUrls: ['./audio-settings.component.css']
 })
 export class AudioSettingsComponent {
+  version = '1.0.0';
+  showDisclaimer = false;
   selectedBand = signal<BrainwaveBand | null>(null);
   importMessage = signal<string>('');
   importSuccess = signal<boolean>(false);
   
   bands: BrainwaveBand[] = ['delta', 'theta', 'alpha', 'beta', 'gamma'];
+  expandedBands = signal<Set<BrainwaveBand>>(new Set());
   
   oscillatorTypes: OscillatorType[] = ['sine', 'square', 'sawtooth', 'triangle'];
 
@@ -163,6 +165,16 @@ export class AudioSettingsComponent {
 
   updateDominantAudioMode(mode: string): void {
     this.alertService.setDominantAudioMode(mode as DominantAudioMode);
+    
+    // Auto-adjust pitch shift to sensible defaults when changing modes
+    const currentSettings = this.alertService.dominantAlertSettings();
+    if (mode === 'pitch-higher' && currentSettings.pitchShift < 100) {
+      // If switching to higher pitch but current value is lower, set to 150%
+      this.alertService.setDominantPitchShift(150);
+    } else if (mode === 'pitch-lower' && currentSettings.pitchShift > 100) {
+      // If switching to lower pitch but current value is higher, set to 75%
+      this.alertService.setDominantPitchShift(75);
+    }
   }
 
   updateDominantPitchShift(percent: number): void {
@@ -294,5 +306,10 @@ export class AudioSettingsComponent {
   getStorageInfo(): string {
     const stats = this.dataManagementService.getStorageStats();
     return stats.formattedTotal;
+  }
+
+  testDominantSound(): void {
+    const settings = this.alertService.dominantAlertSettings();
+    this.audioService.testDominantSound(settings.audioMode, settings.pitchShift);
   }
 }

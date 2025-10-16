@@ -15,6 +15,7 @@ export class SessionHistoryComponent {
   selectedSession: SessionData | null = null;
   editingNotes = false;
   notesText = '';
+  showDisclaimer = false;
 
   summary = computed(() => this.sessionService.getSummary());
   sessions = computed(() => this.sessionService.sessions());

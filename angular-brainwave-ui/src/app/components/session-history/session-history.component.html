@@ -149,6 +149,44 @@
         </button>
       </div>
     }
+
+    <!-- Footer: Version & Disclaimer -->
+    <div class="mt-8 pt-6 border-t border-gray-700 space-y-3">
+      <div class="text-center text-xs text-gray-500">
+        <p class="font-medium">OpenBCI Brainwave Monitor v1.0.0</p>
+      </div>
+      
+      <div class="text-center text-xs text-gray-500">
+        <button 
+          (click)="showDisclaimer = !showDisclaimer"
+          class="cursor-pointer hover:text-gray-400 transition-colors inline-flex items-center gap-1"
+          aria-expanded="{{showDisclaimer}}"
+          aria-label="Toggle medical disclaimer">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Medical Disclaimer
+          <svg class="w-3 h-3 transition-transform" [class.rotate-180]="showDisclaimer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        @if (showDisclaimer) {
+          <div class="mt-3 p-3 bg-gray-800/50 rounded text-left border border-yellow-600/30 max-w-xl mx-auto">
+            <p class="mb-2">⚠️ <strong>For Research & Educational Use Only</strong></p>
+            <p class="text-gray-400 leading-relaxed">
+              This software is not a medical device and has not been evaluated by the FDA. 
+              It is not intended to diagnose, treat, cure, or prevent any disease or medical condition. 
+              Consult qualified healthcare professionals for medical advice. Use at your own risk.
+            </p>
+            <p class="mt-2 text-gray-500">
+              Licensed under MIT License. See LICENSE file for details.
+            </p>
+          </div>
+        }
+      </div>
+    </div>
   </div>
 </div>
 

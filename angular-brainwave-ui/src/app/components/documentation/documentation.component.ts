@@ -17,6 +17,7 @@ interface DocSection {
 })
 export class DocumentationComponent {
   @Output() closeClick = new EventEmitter<void>();
+  showDisclaimer = false;
 
   sections = signal<DocSection[]>([
     { id: 'overview', title: 'App Overview', icon: '📱', expanded: true },

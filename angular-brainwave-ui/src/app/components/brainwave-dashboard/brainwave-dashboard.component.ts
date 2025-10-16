@@ -18,6 +18,7 @@ export class BrainwaveDashboardComponent implements OnInit {
   @Output() docsClick = new EventEmitter<void>();
   
   showSettings = signal(false);
+  showDisclaimer = false;
   isRecording = computed(() => this.sessionService.isRecording());
   
   // Computed properties for reactive UI updates
