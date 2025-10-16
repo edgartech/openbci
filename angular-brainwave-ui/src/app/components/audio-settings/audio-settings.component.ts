@@ -2,7 +2,7 @@ import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AudioService, AudioConfig } from '../../services/audio.service';
-import { AlertService } from '../../services/alert.service';
+import { AlertService, ConfidenceLevel, DominantAudioMode } from '../../services/alert.service';
 import { BrainwaveBand, BAND_INFO } from '../../services/brainwave.service';
 import { DataManagementService } from '../../services/data-management.service';
 
@@ -144,7 +144,69 @@ export class AudioSettingsComponent {
     if (confirm('Reset all audio settings to defaults?')) {
       this.audioService.resetToDefaults();
       this.alertService.resetThresholds();
+      this.alertService.resetDominantSettings();
     }
+  }
+
+  // Dominant alert methods
+  updateDominantEnabled(enabled: boolean): void {
+    this.alertService.setDominantEnabled(enabled);
+  }
+
+  updateDominantConfidenceLevel(level: string): void {
+    this.alertService.setDominantConfidenceLevel(level as ConfidenceLevel);
+  }
+
+  updateDominantCooldown(seconds: number): void {
+    this.alertService.setDominantCooldown(seconds);
+  }
+
+  updateDominantAudioMode(mode: string): void {
+    this.alertService.setDominantAudioMode(mode as DominantAudioMode);
+  }
+
+  updateDominantPitchShift(percent: number): void {
+    this.alertService.setDominantPitchShift(percent);
+  }
+
+  getAudioModeLabel(mode: DominantAudioMode): string {
+    const labels: Record<DominantAudioMode, string> = {
+      'same-as-live': 'Same as Live Alerts',
+      'pitch-higher': 'Higher Pitch',
+      'pitch-lower': 'Lower Pitch',
+      'separate': 'Separate Audio (Future)'
+    };
+    return labels[mode];
+  }
+
+  getAudioModeDescription(mode: DominantAudioMode): string {
+    const descriptions: Record<DominantAudioMode, string> = {
+      'same-as-live': 'Play identical sound as live alerts',
+      'pitch-higher': 'Play same sound at higher pitch to distinguish',
+      'pitch-lower': 'Play same sound at lower pitch to distinguish',
+      'separate': 'Use completely separate audio (coming soon)'
+    };
+    return descriptions[mode];
+  }
+
+  getConfidenceLevelLabel(level: ConfidenceLevel): string {
+    const labels: Record<ConfidenceLevel, string> = {
+      'any': '1 Star+ (Any)',
+      'moderate-plus': '2 Stars+ (Moderate+)',
+      'high-plus': '3 Stars+ (High+)',
+      'very-high': '4 Stars (Very High)'
+    };
+    return labels[level];
+  }
+
+  getConfidenceDescription(level: ConfidenceLevel): string {
+    const descriptions: Record<ConfidenceLevel, string> = {
+      'any': 'Alert for any confidence level',
+      'moderate-plus': 'Alert when 50%+ of time in band',
+      'high-plus': 'Alert when 65%+ of time in band',
+      'very-high': 'Alert when 80%+ of time in band'
+    };
+    return descriptions[level];
   }
 
   // Data management methods

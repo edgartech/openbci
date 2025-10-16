@@ -85,8 +85,8 @@ export class AudioService {
     });
   }
 
-  playForBand(band: BrainwaveBand): void {
-    if (!this.globalEnabled()) {
+  playForBand(band: BrainwaveBand, bypassGlobalControl = false): void {
+    if (!bypassGlobalControl && !this.globalEnabled()) {
       return;
     }
 
@@ -119,6 +119,41 @@ export class AudioService {
     }
   }
 
+  playForBandWithPitch(band: BrainwaveBand, pitchMultiplier: number, bypassGlobalControl = false): void {
+    if (!bypassGlobalControl && !this.globalEnabled()) {
+      return;
+    }
+
+    const settings = this.audioSettings();
+    const config = settings[band];
+
+    if (!config.enabled) {
+      return;
+    }
+
+    const effectiveVolume = (config.volume / 100) * (this.masterVolume() / 100);
+
+    switch (config.sourceType) {
+      case 'preset':
+        this.playPresetWithPitch(config.presetSound!, effectiveVolume, pitchMultiplier);
+        break;
+      case 'custom':
+        this.playCustomWithPitch(config.customAudioUrl!, effectiveVolume, pitchMultiplier);
+        break;
+      case 'tone':
+        // For tones, adjust the frequency directly
+        this.playTone(
+          config.toneFrequency! * pitchMultiplier,
+          config.toneType!,
+          config.toneDuration!,
+          effectiveVolume
+        );
+        break;
+      case 'disabled':
+        break;
+    }
+  }
+
   private playPreset(soundName: string, volume: number): void {
     const audio = this.preloadedAudio.get(soundName);
     if (audio) {
@@ -133,10 +168,34 @@ export class AudioService {
     }
   }
 
+  private playPresetWithPitch(soundName: string, volume: number, pitchMultiplier: number): void {
+    const audio = this.preloadedAudio.get(soundName);
+    if (audio) {
+      const clone = audio.cloneNode() as HTMLAudioElement;
+      clone.volume = volume;
+      clone.playbackRate = pitchMultiplier; // Change pitch by adjusting playback speed
+      clone.preservesPitch = false; // Ensure pitch changes with speed
+      clone.play().catch(err => {
+        console.error(`Error playing preset sound '${soundName}' with pitch:`, err);
+        console.warn(`Preset audio file might be missing: assets/sounds/${soundName}.mp3`);
+      });
+    } else {
+      console.error(`Preset sound '${soundName}' not found. Add file: assets/sounds/${soundName}.mp3`);
+    }
+  }
+
   private playCustom(url: string, volume: number): void {
     const audio = new Audio(url);
     audio.volume = volume;
     audio.play().catch(err => console.error('Error playing custom sound:', err));
+  }
+
+  private playCustomWithPitch(url: string, volume: number, pitchMultiplier: number): void {
+    const audio = new Audio(url);
+    audio.volume = volume;
+    audio.playbackRate = pitchMultiplier;
+    audio.preservesPitch = false;
+    audio.play().catch(err => console.error('Error playing custom sound with pitch:', err));
   }
 
   private playTone(frequency: number, type: OscillatorType, duration: number, volume: number): void {

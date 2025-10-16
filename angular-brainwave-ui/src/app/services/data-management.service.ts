@@ -10,6 +10,7 @@ export interface BackupData {
   };
   alerts: {
     thresholds: string | null;
+    dominantSettings: string | null;
   };
   sessions: {
     sessions: string | null;
@@ -38,7 +39,8 @@ export class DataManagementService {
         globalEnabled: localStorage.getItem('brainwave-global-enabled')
       },
       alerts: {
-        thresholds: localStorage.getItem('brainwave-thresholds')
+        thresholds: localStorage.getItem('brainwave-thresholds'),
+        dominantSettings: localStorage.getItem('brainwave-dominant-alerts')
       },
       sessions: {
         sessions: localStorage.getItem('brainwave-sessions')
@@ -112,6 +114,10 @@ export class DataManagementService {
         localStorage.setItem('brainwave-thresholds', backup.alerts.thresholds);
         itemsRestored++;
       }
+      if (backup.alerts.dominantSettings) {
+        localStorage.setItem('brainwave-dominant-alerts', backup.alerts.dominantSettings);
+        itemsRestored++;
+      }
 
       // Restore sessions
       if (backup.sessions.sessions) {
@@ -172,6 +178,7 @@ export class DataManagementService {
       if (backup.audio.masterVolume) itemCount++;
       if (backup.audio.globalEnabled) itemCount++;
       if (backup.alerts.thresholds) itemCount++;
+      if (backup.alerts.dominantSettings) itemCount++;
       if (backup.sessions.sessions) itemCount++;
 
       return {
@@ -208,6 +215,7 @@ export class DataManagementService {
       'brainwave-master-volume',
       'brainwave-global-enabled',
       'brainwave-thresholds',
+      'brainwave-dominant-alerts',
       'brainwave-sessions',
       'brainwave-last-backup'
     ];
@@ -236,7 +244,7 @@ export class DataManagementService {
       getSize('brainwave-global-enabled');
 
     const sessionsSize = getSize('brainwave-sessions');
-    const alertsSize = getSize('brainwave-thresholds');
+    const alertsSize = getSize('brainwave-thresholds') + getSize('brainwave-dominant-alerts');
 
     const totalSize = audioSize + sessionsSize + alertsSize;
 
