@@ -15,6 +15,7 @@ import { WaveformDisplayComponent } from '../waveform-display/waveform-display.c
 export class BrainwaveDashboardComponent implements OnInit {
   @Output() settingsClick = new EventEmitter<void>();
   @Output() historyClick = new EventEmitter<void>();
+  @Output() docsClick = new EventEmitter<void>();
   
   showSettings = signal(false);
   isRecording = computed(() => this.sessionService.isRecording());
@@ -159,6 +160,10 @@ export class BrainwaveDashboardComponent implements OnInit {
 
   toggleHistory(): void {
     this.historyClick.emit();
+  }
+
+  toggleDocs(): void {
+    this.docsClick.emit();
   }
 
   reconnect(): void {

@@ -1,0 +1,309 @@
+<div class="min-h-screen bg-gray-900 text-white">
+  <header class="sticky top-0 z-50 bg-gray-800 border-b border-gray-700 px-4 py-3">
+    <div class="flex items-center justify-between max-w-4xl mx-auto">
+      <div class="flex items-center gap-3">
+        <button (click)="close()" class="touch-target p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+        </button>
+        <h1 class="text-xl font-bold">📚 Documentation</h1>
+      </div>
+      <div class="flex gap-2">
+        <button (click)="expandAll()" class="text-xs px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors">Expand All</button>
+        <button (click)="collapseAll()" class="text-xs px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors">Collapse</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-6 pb-20">
+    @for (section of sections(); track section.id) {
+      <div class="mb-4 bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+        <button (click)="toggleSection(section.id)" class="w-full flex items-center justify-between p-4 text-left hover:bg-gray-750 transition-colors touch-target">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">{{ section.icon }}</span>
+            <h2 class="text-lg font-semibold">{{ section.title }}</h2>
+          </div>
+          <svg class="w-6 h-6 transition-transform" [class.rotate-180]="section.expanded" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        @if (section.expanded) {
+          <div class="p-4 pt-0 border-t border-gray-700 text-gray-300">
+            
+            @if (section.id === 'overview') {
+              <div class="space-y-4">
+                <p>The <strong class="text-white">Brainwave Monitor</strong> displays real-time EEG data from OpenBCI hardware, showing which brainwave frequency bands are currently dominant.</p>
+                <div class="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
+                  <h4 class="font-semibold text-blue-300 mb-2">✨ Key Features</h4>
+                  <ul class="space-y-1 text-sm">
+                    <li>• Real-time monitoring of 5 brainwave bands</li>
+                    <li>• Two-tier display (30s average + live)</li>
+                    <li>• Customizable audio alerts</li>
+                    <li>• Session recording & history</li>
+                    <li>• Mobile-optimized interface</li>
+                  </ul>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'brainwaves') {
+              <div class="space-y-4">
+                <p>Brain electrical activity is grouped into 5 frequency bands, each associated with different mental states:</p>
+                <div class="space-y-3">
+                  <div class="bg-purple-900/20 border-l-4 border-purple-500 p-3 rounded">
+                    <h4 class="font-bold text-purple-300 mb-1">Delta (Δ) • 1-4 Hz</h4>
+                    <p class="text-sm"><strong>State:</strong> Deep sleep, unconsciousness, healing</p>
+                    <p class="text-sm"><strong>When:</strong> Rare while awake; indicates deep meditation or extreme fatigue</p>
+                  </div>
+                  <div class="bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded">
+                    <h4 class="font-bold text-blue-300 mb-1">Theta (θ) • 4-8 Hz</h4>
+                    <p class="text-sm"><strong>State:</strong> Deep meditation, drowsiness, creativity</p>
+                    <p class="text-sm"><strong>When:</strong> Meditation, daydreaming, deep relaxation</p>
+                  </div>
+                  <div class="bg-green-900/20 border-l-4 border-green-500 p-3 rounded">
+                    <h4 class="font-bold text-green-300 mb-1">Alpha (α) • 8-12 Hz</h4>
+                    <p class="text-sm"><strong>State:</strong> Relaxed awareness, calm, present moment</p>
+                    <p class="text-sm"><strong>When:</strong> Eyes closed, relaxed but awake; bridge between conscious/subconscious</p>
+                  </div>
+                  <div class="bg-orange-900/20 border-l-4 border-orange-500 p-3 rounded">
+                    <h4 class="font-bold text-orange-300 mb-1">Beta (β) • 13-30 Hz</h4>
+                    <p class="text-sm"><strong>State:</strong> Active thinking, focus, alertness</p>
+                    <p class="text-sm"><strong>When:</strong> Working, concentrating; high Beta = stress/anxiety</p>
+                  </div>
+                  <div class="bg-red-900/20 border-l-4 border-red-500 p-3 rounded">
+                    <h4 class="font-bold text-red-300 mb-1">Gamma (γ) • 30-45 Hz</h4>
+                    <p class="text-sm"><strong>State:</strong> Peak performance, heightened perception</p>
+                    <p class="text-sm"><strong>When:</strong> Intense focus, learning, flow states</p>
+                  </div>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'display') {
+              <div class="space-y-4">
+                <p>The app shows brain state in two ways:</p>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">🧠 Primary State (30s Average)</h4>
+                  <p class="text-sm mb-2">Your stable, dominant mental state over the last 30 seconds.</p>
+                  <ul class="text-sm space-y-1">
+                    <li>• Filters out momentary fluctuations</li>
+                    <li>• Shows percentage of time in each band</li>
+                    <li>• Star rating indicates confidence/stability</li>
+                    <li>• Distribution bars show all 5 bands</li>
+                  </ul>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">⚡ Live State (Instantaneous)</h4>
+                  <p class="text-sm mb-2">Right now - the band with highest power this moment.</p>
+                  <ul class="text-sm space-y-1">
+                    <li>• Immediate feedback on current activity</li>
+                    <li>• Shows exact center frequency (Hz)</li>
+                    <li>• Timer shows continuous time in band</li>
+                    <li>• Progress bar fills toward alert threshold</li>
+                  </ul>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'confidence') {
+              <div class="space-y-3">
+                <p>Star rating indicates how consistent your state is:</p>
+                <div class="space-y-2">
+                  <div class="bg-gray-700 rounded p-3">
+                    <p class="text-sm"><span class="text-yellow-400">⭐⭐⭐⭐</span> <strong class="text-white">Very High (80%+):</strong> Very stable, clear state</p>
+                  </div>
+                  <div class="bg-gray-700 rounded p-3">
+                    <p class="text-sm"><span class="text-yellow-400">⭐⭐⭐</span> <strong class="text-white">High (65-79%):</strong> Stable with minimal fluctuation</p>
+                  </div>
+                  <div class="bg-gray-700 rounded p-3">
+                    <p class="text-sm"><span class="text-yellow-400">⭐⭐</span> <strong class="text-white">Moderate (50-64%):</strong> Somewhat stable, may be transitioning</p>
+                  </div>
+                  <div class="bg-gray-700 rounded p-3">
+                    <p class="text-sm"><span class="text-gray-500">⭐</span> <strong class="text-white">Low (&lt;50%):</strong> Fluctuating between multiple bands</p>
+                  </div>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'graph') {
+              <div class="space-y-4">
+                <p>The <strong class="text-white">Live Signal</strong> graph visualizes brainwave power as a scrolling waveform.</p>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">Understanding the Graph</h4>
+                  <ul class="text-sm space-y-2">
+                    <li><strong>Vertical (Power):</strong> 0.0 to 1.0 - strength of dominant band</li>
+                    <li><strong>Horizontal (Time):</strong> ~0.4 seconds of history, scrolls right to left</li>
+                    <li><strong>Color:</strong> Matches dominant band (Purple→Red)</li>
+                    <li><strong>Wave Height:</strong> Taller = stronger power</li>
+                    <li><strong>Smoothness:</strong> Smooth = stable; Jagged = fluctuating</li>
+                    <li><strong>FPS:</strong> Frames per second (smoothness indicator)</li>
+                  </ul>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'bandpower') {
+              <div class="space-y-4">
+                <p><strong class="text-white">Band Power Distribution</strong> shows all 5 bands with percentage bars.</p>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">How It's Calculated</h4>
+                  <ol class="text-sm space-y-2 list-decimal list-inside">
+                    <li><strong>FFT Processing:</strong> Converts time-domain to frequency-domain</li>
+                    <li><strong>Band Power:</strong> Calculates total power in each frequency range</li>
+                    <li><strong>Normalization:</strong> Values sum to 100% for relative distribution</li>
+                    <li><strong>Display:</strong> Each percentage = relative strength vs other bands</li>
+                  </ol>
+                </div>
+                <div class="bg-blue-900/20 border border-blue-700 rounded p-3">
+                  <p class="text-sm"><strong>Example:</strong> Alpha 65%, Beta 20%, Others 15% → Strong relaxed state with mild alertness</p>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'alerts') {
+              <div class="space-y-4">
+                <p>Audio alerts trigger when you enter or maintain specific mental states.</p>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">⚡ Live Alerts</h4>
+                  <ul class="text-sm space-y-1">
+                    <li>• Based on instantaneous dominant band</li>
+                    <li>• Duration threshold: 0-30s (configurable per band)</li>
+                    <li>• Fires only when <strong>changing</strong> bands</li>
+                    <li>• Progress bar shows time toward threshold</li>
+                  </ul>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">🧠 Dominant Alerts (Primary State)</h4>
+                  <ul class="text-sm space-y-1">
+                    <li>• Based on 30s average (more stable)</li>
+                    <li>• Confidence level filter (any/moderate+/high+/very high)</li>
+                    <li>• Cooldown period prevents rapid re-triggering</li>
+                    <li>• Can use different pitch or separate sounds</li>
+                  </ul>
+                </div>
+                <div class="bg-yellow-900/20 border border-yellow-700 rounded p-3">
+                  <p class="text-sm"><strong>💡 Tip:</strong> Set different thresholds per band. Example: Alpha 5s, Beta 3s allows quick focus detection</p>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'audio') {
+              <div class="space-y-4">
+                <p>Configure audio alerts per band in Settings.</p>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">Audio Source Types</h4>
+                  <ul class="text-sm space-y-2">
+                    <li><strong>Preset:</strong> Built-in sounds (beep, chime, bell, etc.)</li>
+                    <li><strong>Tone:</strong> Generated tones (frequency, wave type, duration)</li>
+                    <li><strong>Custom:</strong> Upload your own audio files (MP3/WAV/OGG, max 5MB)</li>
+                    <li><strong>Disabled:</strong> No sound for that band</li>
+                  </ul>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">Volume Controls</h4>
+                  <ul class="text-sm space-y-1">
+                    <li>• Per-band volume (0-100%)</li>
+                    <li>• Master volume affects all bands</li>
+                    <li>• Global enable/disable toggle</li>
+                    <li>• Test button to preview sounds</li>
+                  </ul>
+                </div>
+                <div class="bg-blue-900/20 border border-blue-700 rounded p-3">
+                  <p class="text-sm"><strong>📱 iOS Note:</strong> First tap requires user gesture to enable audio due to browser restrictions</p>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'sessions') {
+              <div class="space-y-4">
+                <p>Record sessions to track mental state patterns over time.</p>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">What's Recorded</h4>
+                  <ul class="text-sm space-y-1">
+                    <li>• Start/end time and total duration</li>
+                    <li>• Time spent in each brainwave band</li>
+                    <li>• Percentage distribution across bands</li>
+                    <li>• Average power for each band</li>
+                    <li>• Dominant band (most time spent)</li>
+                    <li>• Optional notes</li>
+                  </ul>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">Session History</h4>
+                  <p class="text-sm mb-2">View past sessions with:</p>
+                  <ul class="text-sm space-y-1">
+                    <li>• Summary statistics (total time, favorite state)</li>
+                    <li>• Individual session details</li>
+                    <li>• Weekly tracking</li>
+                    <li>• Export/import capability</li>
+                  </ul>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'data') {
+              <div class="space-y-4">
+                <p>Backup and restore all settings and session history.</p>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">What's Backed Up</h4>
+                  <ul class="text-sm space-y-1">
+                    <li>• All audio settings (per-band configs, volumes)</li>
+                    <li>• Alert thresholds and dominant alert settings</li>
+                    <li>• Session history (up to 100 sessions)</li>
+                    <li>• Master volume and global settings</li>
+                  </ul>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">Export/Import</h4>
+                  <ul class="text-sm space-y-1">
+                    <li>• Export creates timestamped JSON file</li>
+                    <li>• Import validates and restores data</li>
+                    <li>• Transfer settings between devices</li>
+                    <li>• Safe to share (no personal EEG data)</li>
+                  </ul>
+                </div>
+                <div class="bg-yellow-900/20 border border-yellow-700 rounded p-3">
+                  <p class="text-sm"><strong>⚠️ Important:</strong> Data stored in browser localStorage. Clear browser data = lost settings unless backed up</p>
+                </div>
+              </div>
+            }
+            
+            @if (section.id === 'calculations') {
+              <div class="space-y-4">
+                <p><strong class="text-white">How the app processes your brainwave data:</strong></p>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">Backend (C# .NET)</h4>
+                  <ol class="text-sm space-y-2 list-decimal list-inside">
+                    <li><strong>UDP Reception:</strong> Receives EEG data from OpenBCI on port 15000/15001</li>
+                    <li><strong>FFT Processing:</strong> Fast Fourier Transform converts time → frequency domain</li>
+                    <li><strong>Band Power Calculation:</strong> Sums power in each frequency range (Delta 1-4Hz, etc.)</li>
+                    <li><strong>Dominance Detection:</strong> Identifies band with highest power (threshold: 45%)</li>
+                    <li><strong>Stability Check:</strong> Requires 4 consecutive frames for confirmation</li>
+                    <li><strong>WebSocket Broadcast:</strong> Sends processed data to web clients on port 8080</li>
+                  </ol>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <h4 class="font-bold text-white mb-2">Frontend (Angular)</h4>
+                  <ol class="text-sm space-y-2 list-decimal list-inside">
+                    <li><strong>WebSocket Connection:</strong> Receives real-time data from backend</li>
+                    <li><strong>Live State:</strong> Displays current dominant band immediately</li>
+                    <li><strong>Primary State:</strong> Tracks 30s window, calculates percentage distribution</li>
+                    <li><strong>Confidence:</strong> Based on how dominant the primary band is</li>
+                    <li><strong>Alert Tracking:</strong> Monitors time in band, triggers alerts per threshold</li>
+                    <li><strong>Visualization:</strong> Renders graph, meters, and color-coded UI</li>
+                  </ol>
+                </div>
+                <div class="bg-blue-900/20 border border-blue-700 rounded p-3">
+                  <p class="text-sm"><strong>🔢 Example:</strong> If Delta=0.05, Theta=0.15, Alpha=0.50, Beta=0.25, Gamma=0.05 → Alpha is dominant (50%)</p>
+                </div>
+              </div>
+            }
+            
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>

@@ -3,17 +3,19 @@ import { CommonModule } from '@angular/common';
 import { BrainwaveDashboardComponent } from './components/brainwave-dashboard/brainwave-dashboard.component';
 import { AudioSettingsComponent } from './components/audio-settings/audio-settings.component';
 import { SessionHistoryComponent } from './components/session-history/session-history.component';
+import { DocumentationComponent } from './components/documentation/documentation.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, BrainwaveDashboardComponent, AudioSettingsComponent, SessionHistoryComponent],
+  imports: [CommonModule, BrainwaveDashboardComponent, AudioSettingsComponent, SessionHistoryComponent, DocumentationComponent],
   template: `
     <div class="app-container">
       @if (currentView() === 'dashboard') {
         <app-brainwave-dashboard 
           (settingsClick)="showSettings()" 
-          (historyClick)="showHistory()" />
+          (historyClick)="showHistory()"
+          (docsClick)="showDocs()" />
       } @else if (currentView() === 'settings') {
         <div class="settings-view">
           <header class="sticky top-0 z-50 bg-gray-800 border-b border-gray-700 px-4 py-3">
@@ -48,6 +50,8 @@ import { SessionHistoryComponent } from './components/session-history/session-hi
           </header>
           <app-session-history />
         </div>
+      } @else if (currentView() === 'docs') {
+        <app-documentation (closeClick)="showDashboard()" />
       }
     </div>
   `,
@@ -74,7 +78,7 @@ import { SessionHistoryComponent } from './components/session-history/session-hi
   `]
 })
 export class AppComponent {
-  currentView = signal<'dashboard' | 'settings' | 'history'>('dashboard');
+  currentView = signal<'dashboard' | 'settings' | 'history' | 'docs'>('dashboard');
 
   showDashboard(): void {
     this.currentView.set('dashboard');
@@ -86,5 +90,9 @@ export class AppComponent {
 
   showHistory(): void {
     this.currentView.set('history');
+  }
+
+  showDocs(): void {
+    this.currentView.set('docs');
   }
 }
